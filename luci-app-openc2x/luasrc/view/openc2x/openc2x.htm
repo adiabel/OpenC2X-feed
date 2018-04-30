@@ -1,0 +1,134 @@
+<%+header%>
+
+<% 
+local is_running = false
+local f = assert (io.popen ("pidof httpServer"))
+  
+ for line in f:lines() do
+   is_running = true
+ end -- for loop
+   
+ f:close()
+
+
+%>
+
+
+<%
+	if is_running then
+%>
+
+
+<!-- START OPENC2X STYLES-->
+<link type="text/css" rel="stylesheet" href="/luci-static/resources/openc2x/lib/leaflet/leaflet.css"/>
+<link type="text/css" rel="stylesheet" href="/luci-static/resources/openc2x/css/openc2x.css"/>
+<!-- END OPENC2X STYLES-->	
+		
+	<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+	<script type="text/javascript">//<![CDATA[
+
+	
+	function start_openc2x() {
+		(new XHR()).post('<%=url('admin/openc2x/stop_openc2x')%>/', { token: '<%=token%>' },
+			function(x) {
+				location.href = '<%=url('admin/openc2x/overview')%>';
+			}
+		);
+	}
+	//]]></script>		
+						
+
+
+
+<!-- START OPENC2X HTML-->
+
+					<div class="openc2x">
+						
+						<div class="cbi-page-actions">
+							
+							<input type="button" class="cbi-button cbi-button-remove" onclick="start_openc2x()" value="<%:Stop OpenC2X%>" />
+	
+							<input class="cbi-button cbi-button-apply" onclick="createCamContainer()" value="Own CAM" type="button">	
+								
+							<input class="cbi-button cbi-button-save" onclick="createReceivedCamContainer()" value="Received CAMs" type="button">
+								
+							<input class="cbi-button cbi-button-reset" onclick="createDenmContainer()" value="Own DENM" type="button">
+							
+							<input class="cbi-button cbi-button-remove" onclick="createReceivedDenmContainer()" value="Received DENMs" type="button">
+							
+							<input class="cbi-button cbi-button-apply" onclick="triggerDenm()" value="Trigger DENM" type="button">	
+								
+							<input class="cbi-button cbi-button-save" onclick="createDccInfoContainer()" value="DCC Info" type="button">
+															
+							<input class="cbi-button cbi-button-save" onclick="createMessageLogger()" value="Message logger" type="button">
+								
+						</div>
+						
+						<div id="openc2x-grid">
+							<fieldset id="map-fieldset" class="cbi-section">
+								<span class="panel-title openc2x-content">Map</span>
+								<div class="panel-content">
+									<div class="container " id="mapWrapper">
+										<div id="mapContainer">
+										</div>
+									</div>
+								</div>
+							</fieldset>		
+						</div>
+					</div>
+
+<!-- END OPENC2X HTML-->
+
+<!-- START OPENC2X SCRIPTS-->
+					<script src="/luci-static/material/js/jquery.min.js"></script>
+					<script>window.jQuery || document.write('<script src="/luci-static/material/js/zepto.min.js"><\/script><script src="/luci-static/resources/openc2x/lib/zepto/ajax.js"><\/script>')</script>
+					<script src="/luci-static/resources/openc2x/lib/leaflet/leaflet.js"></script>
+
+					<script src="/luci-static/resources/openc2x/lib/Sortable/Sortable.min.js"></script>
+
+					<script src="/luci-static/resources/openc2x/js/utililty.js"></script>
+					<script src="/luci-static/resources/openc2x/js/webAppQuerys.js"></script>
+					<script src="/luci-static/resources/openc2x/js/layoutManager.js"></script>
+					<script src="/luci-static/resources/openc2x/js/map.js"></script>
+					<script src="/luci-static/resources/openc2x/js/main.js"></script>
+<!-- END OPENC2X SCRIPTS-->
+
+<% 
+	else
+%>
+
+	<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+	<script type="text/javascript">//<![CDATA[
+
+	
+	function start_openc2x() {
+		(new XHR()).post('<%=url('admin/openc2x/start_openc2x')%>/', { token: '<%=token%>' },
+			function(x) {
+				location.href = '<%=url('admin/openc2x/overview')%>';
+			}
+		);
+	}
+	//]]></script>
+
+
+
+
+							<fieldset class="cbi-section">
+								<span class="panel-title openc2x-content">Info</span>
+								<div class="panel-content">
+									<div class="container">
+										OpenC2X isn't running. Do you want to start it?
+										
+										<input type="button" class="cbi-button cbi-button-add" style="width:100px" onclick="start_openc2x()" value="<%:Start OpenC2X%>" />
+									</div>
+								</div>
+							</fieldset>	
+
+<% 
+	end
+%>
+
+
+
+
+<%+footer%>

@@ -1,0 +1,77 @@
+<%+header%>
+
+
+<%-
+	local uci = require "luci.model.uci"
+	local lfs = require"lfs"
+	local _uci = uci.cursor()
+	local configs = { "FACTORY_CONFIG" }
+	local logBasePaths = { "/var/log/openc2x/FACTORY_CONFIG" }
+	
+	_uci:foreach("openc2x_common", "common",
+		function(s)
+			configs[#configs+1] = s['.name']
+			logBasePaths[#logBasePaths+1] = s['logBasePath']
+		end)
+
+	function exists(name)
+		if type(name)~="string" then return false end
+		return os.rename(name,name) and true or false
+	end
+-%>
+
+<div class="cbi-map">
+	<fieldset class="cbi-section">
+		<legend><%:Configurations%></legend>
+
+		<table class="cbi-section-table" style="margin:10px; empty-cells:hide">
+			<tr class="cbi-section-table-titles">
+				<th class="cbi-section-table-cell"><%:Configuration%></th>
+				<th class="cbi-section-table-cell"><%:Experiments%></th>
+			</tr>
+			<%
+					for i, config in ipairs(configs) do	
+					logBasePath = logBasePaths[i]
+					path = logBasePath .. "/" .. config
+			%>		
+					
+				<tr class="cbi-section-table-row cbi-rowstyle-<%=i % 2 + 1%>">
+					<td class="cbi-value-field">
+						<strong><%=config%></strong>
+					</td>
+					<td class="cbi-value-field">
+					
+			<%		
+					if exists(path) then
+						for file in lfs.dir(path) do
+							if file ~= "." and file ~= ".." then
+			%>
+					<form class="inline" method="post" action="<%=url('admin/openc2x/download_results')%>">
+						<input type="hidden" name="token" value="<%=token%>" />
+						<input type="hidden" name="path" value="<%=logBasePath%>" />
+						<input type="hidden" name="config" value="<%=config%>" />
+						<input type="hidden" name="expNo" value="<%=file%>" />
+						<input class="cbi-button cbi-button-add" type="submit" name="download" value="<%:Experiment%> <%=file%>" />
+					</form>
+						
+						
+			<%
+							end
+						end
+					end
+			%>
+					</td>
+				</tr>
+			<% 	
+			end
+			%>
+		</table>
+			<form class="inline" method="post" action="<%=url('admin/openc2x/download_all')%>">
+				<input type="hidden" name="token" value="<%=token%>" />
+				<input type="hidden" name="path" value="/var/log/openc2x/" />
+				<input class="cbi-button cbi-button-add" type="submit" name="download_all" value="<%:Download all%>" />
+			</form>
+	</fieldset>
+</div>
+
+<%+footer%>

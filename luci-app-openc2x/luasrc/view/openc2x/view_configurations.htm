@@ -1,0 +1,102 @@
+<%-
+	local uci = require "luci.model.uci"
+	local _uci = uci.cursor()
+	local configs = { }
+	local descriptions = { }
+	local datetimes = { }
+	local current_config
+	
+	_uci:foreach("openc2x", "openc2x",
+		function(s)
+			configs[#configs+1] = s['.name']
+			descriptions[#descriptions+1] = s['description']
+			datetimes[#datetimes+1] = s['datetime']
+		end)
+		
+	_uci:foreach("openc2x", "global", function(s)
+		current_config = s['config_name']
+	end)
+
+-%>
+
+<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script type="text/javascript">//<![CDATA[
+
+	function config_delete(id) {
+		if (!confirm('<%:Really delete this configuration? The deletion cannot be undone!%>'))
+			return;
+
+		(new XHR()).post('<%=url('admin/openc2x/config_delete')%>/' + id, { token: '<%=token%>' },
+			function(x) {
+				location.href = '<%=url('admin/openc2x/configs')%>';
+			}
+		);
+	}
+	
+	
+	function config_current(id) {
+		(new XHR()).post('<%=url('admin/openc2x/config_current')%>/' + id, { token: '<%=token%>' },
+			function(x) {
+				location.href = '<%=url('admin/openc2x/configs')%>';
+			}
+		);
+	}
+//]]></script>
+
+<div class="cbi-map">
+	<fieldset class="cbi-section">
+		<legend><%:Configurations%></legend>
+
+		<table class="cbi-section-table" style="margin:10px; empty-cells:hide">
+			<tr class="cbi-section-table-titles">
+				<th class="cbi-section-table-cell"><%:Current configuration%></th>
+				<th class="cbi-section-table-cell"><%:Configuration%></th>
+				<th class="cbi-section-table-cell"><%:Description%></th>
+				<th class="cbi-section-table-cell"><%:Date and time%></th>
+				<th class="cbi-section-table-cell"><%:Actions%></th>
+			</tr>
+			<%
+					for i, config in ipairs(configs) do	
+					description = descriptions[i]
+					datetime = datetimes[i]
+			%>
+				<tr class="cbi-section-table-row cbi-rowstyle-<%=i % 2 + 1%>">
+					<td>
+						<%
+						if config == current_config then
+						%>
+							<input class="cbi-input-checkbox" value="1" checked="checked" disabled="disabled" size="0" type="checkbox">
+						<% 
+							end
+						%>
+					</td>
+					<td class="cbi-value-field">
+						<strong><%=config%></strong>
+					</td>
+					<td class="cbi-value-field">
+						<%=description%>
+					</td>
+					<td class="cbi-value-field">
+						<%=datetime%>
+					</td>
+
+					<td class="cbi-value-field">
+						<input type="button" class="cbi-button cbi-button-edit" style="width:100px" onclick="location.href='<%=url("admin/openc2x/config", config)%>'" title="<%:Edit this configuration%>" value="<%:Edit%>" id="<%=config%>-ifc-edit" />
+						<input type="button" class="cbi-button cbi-button-remove" style="width:100px" onclick="config_delete('<%=config%>')" value="<%:Delete%>" />
+						<%
+							if config ~= current_config then
+						%>
+						<input type="button" class="cbi-button cbi-button-add" style="width:100px" onclick="config_current('<%=config%>')" value="<%:Set as Current%>" />
+						<% 
+							end
+						%>
+					</td>
+				</tr>
+			<% 	
+			end
+			%>
+		</table>
+
+		<input type="button" class="cbi-button cbi-button-add" value="<%:Add new configuration...%>" onclick="location.href='<%=url("admin/openc2x/config_add")%>'" />
+	</fieldset>
+</div>

@@ -1,0 +1,37 @@
+#!/bin/sh /etc/rc.common
+
+START=35
+STOP=85
+
+USE_PROCD=1
+
+start_service() {
+	procd_open_instance
+	procd_set_param command /usr/bin/cam
+	procd_close_instance
+	
+	procd_open_instance
+	procd_set_param command /usr/bin/httpServer
+	procd_close_instance
+	
+	procd_open_instance
+	procd_set_param command /usr/bin/ldm
+	procd_close_instance
+	
+	procd_open_instance
+	procd_set_param command /usr/bin/denm
+	procd_close_instance
+	
+	procd_open_instance
+	procd_set_param command /usr/bin/dcc
+	procd_close_instance
+	
+	procd_open_instance
+	procd_set_param command /usr/bin/obd2
+	procd_close_instance
+	
+	procd_open_instance
+	procd_set_param command /usr/bin/gpsService
+	procd_close_instance
+}
+

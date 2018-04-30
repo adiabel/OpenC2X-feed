@@ -1,0 +1,8 @@
+#!/bin/sh
+
+/etc/init.d/openc2x enabled && {
+    /etc/init.d/openc2x stop
+    /etc/init.d/openc2x disable
+}
+
+exit 0 
