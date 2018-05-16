@@ -39,6 +39,16 @@ s:option(Value, "countryCode", translate("Country where system is used"))
 
 s:option(Value, "txPower", translate("Power of wlan sender"))
 
+p = s:option(ListValue, "frequency", translate("Frequency of wlan sender"))
+
+p:value("5900", "5900 MHz")
+p:value("5890", "5890 MHz")
+p:value("5880", "5880 MHz")
+p:value("5870", "5870 MHz")
+p:value("5860", "5860 MHz")
+p:value("5850", "5850 MHz")
+p:value("5910", "5910 MHz")
+
 -- End common
 
 --Start cam
