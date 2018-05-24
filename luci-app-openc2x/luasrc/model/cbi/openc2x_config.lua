@@ -23,7 +23,13 @@ p = s:option(ListValue, "ethernetDevice", "Ethernet Device") -- Creates an eleme
 for k, v in ipairs(nets) do
         local iw = luci.sys.wifi.getiwinfo(v)
         if iw ~= null and iw.freqlist then
-                local freq = math.floor(iw.freqlist[1].mhz / 1000)
+				local freq = 0
+				for x,y in ipairs(iw.freqlist) do
+					local tmpFreq = math.floor(y.mhz / 1000)
+					if tmpFreq > freq then
+						freq = tmpFreq
+					end
+				end
                 local str = v .. " - " .. freq .. " GHz"
                 p:value(v, str)
         else
