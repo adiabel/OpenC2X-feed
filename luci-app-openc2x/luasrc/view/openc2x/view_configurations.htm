@@ -4,6 +4,7 @@
 	local configs = { }
 	local descriptions = { }
 	local datetimes = { }
+	local modifiables = { }
 	local current_config
 	
 	_uci:foreach("openc2x", "openc2x",
@@ -11,6 +12,7 @@
 			configs[#configs+1] = s['.name']
 			descriptions[#descriptions+1] = s['description']
 			datetimes[#datetimes+1] = s['datetime']
+			modifiables[#modifiables+1] = s['modifiable']
 		end)
 		
 	_uci:foreach("openc2x", "global", function(s)
@@ -59,6 +61,7 @@
 					for i, config in ipairs(configs) do	
 					description = descriptions[i]
 					datetime = datetimes[i]
+					modifiable = modifiables[i]
 			%>
 				<tr class="cbi-section-table-row cbi-rowstyle-<%=i % 2 + 1%>">
 					<td>
@@ -82,7 +85,14 @@
 
 					<td class="cbi-value-field">
 						<input type="button" class="cbi-button cbi-button-edit" style="width:100px" onclick="location.href='<%=url("admin/openc2x/config", config)%>'" title="<%:Edit this configuration%>" value="<%:Edit%>" id="<%=config%>-ifc-edit" />
+						<%
+							if modifiable == "true" and config ~= current_config then
+						%>
 						<input type="button" class="cbi-button cbi-button-remove" style="width:100px" onclick="config_delete('<%=config%>')" value="<%:Delete%>" />
+						<%
+							end
+						%>
+						
 						<%
 							if config ~= current_config then
 						%>
