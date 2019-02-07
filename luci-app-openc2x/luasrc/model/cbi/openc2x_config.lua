@@ -47,6 +47,7 @@ s:option(Value, "txPower", translate("Power of wlan sender"))
 
 p = s:option(ListValue, "frequency", translate("Frequency of wlan sender"))
 
+p:value("2432", "2432 MHz")
 p:value("5900", "5900 MHz")
 p:value("5890", "5890 MHz")
 p:value("5880", "5880 MHz")
